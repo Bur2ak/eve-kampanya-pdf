@@ -281,15 +281,30 @@ function fit(el,maxPx,minPx){
 }
 function fitCard(kart){
   const ic=kart.querySelector('.icerik'); if(!ic) return;
+  // idempotent: sc/logowrap/badge'i taban değerine sıfırla (tekrar çağrılabilsin)
+  ic.querySelectorAll('.sc:not(.fitw)').forEach(el=>{
+    if(el.dataset.b===undefined) el.dataset.b=parseFloat(getComputedStyle(el).fontSize);
+    el.style.fontSize=el.dataset.b+'px';
+  });
+  ic.querySelectorAll('.logowrap').forEach(l=>{
+    if(l.dataset.b===undefined) l.dataset.b=parseFloat(getComputedStyle(l).width);
+    l.style.width=l.dataset.b+'px';
+  });
+  const bd=ic.querySelector('.badge');
+  if(bd){ if(bd.dataset.b===undefined) bd.dataset.b=parseFloat(getComputedStyle(bd).width);
+          bd.style.width=bd.dataset.b+'px'; bd.style.height=bd.dataset.b+'px'; }
+  // fitw'leri yatayda sığdır (içeride max'a resetler)
   ic.querySelectorAll('.fitw').forEach(el=>fit(el,+el.dataset.max,+el.dataset.min));
+  // dikeyde taşarsa hepsini birlikte küçült
   let g=0;
   while(ic.scrollHeight>ic.clientHeight+1 && g<90){
     ic.querySelectorAll('.sc').forEach(el=>{ const c=parseFloat(getComputedStyle(el).fontSize); el.style.fontSize=(c*0.95)+'px'; });
     ic.querySelectorAll('.logowrap').forEach(l=>l.style.width=(parseFloat(getComputedStyle(l).width)*0.95)+'px');
-    const b=ic.querySelector('.badge'); if(b){ b.style.width=(parseFloat(getComputedStyle(b).width)*0.95)+'px'; b.style.height=b.style.width; }
+    if(bd){ bd.style.width=(parseFloat(getComputedStyle(bd).width)*0.95)+'px'; bd.style.height=bd.style.width; }
     g++;
   }
 }
+function tumFit(){ document.querySelectorAll('.kart').forEach(fitCard); }
 
 /* ---- çizim ---- */
 function veriSec(s){ return s.veri==="kategori" ? (window.KATEGORILER||[]) : (window.URUNLER||[]); }
@@ -304,9 +319,10 @@ function ciz(){
     const p=document.createElement('div'); p.className='sayfa '+s.yon+' '+s.grid; p.innerHTML=inner;
     cikti.appendChild(p);
   }
-  const uygula=()=>document.querySelectorAll('.kart').forEach(fitCard);
-  if(document.fonts && document.fonts.ready){ document.fonts.ready.then(()=>requestAnimationFrame(uygula)); }
-  else requestAnimationFrame(uygula);
+  // font ne zaman yüklenirse yüklensin ölçüm garanti çalışsın (idempotent)
+  requestAnimationFrame(tumFit);
+  setTimeout(tumFit,250);
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(tumFit);
   document.getElementById('say').textContent=list.length+' kayıt · '+Math.ceil(list.length/s.per)+' sayfa';
   document.getElementById('yapistirHint').textContent="Sıra: "+s.yap;
 }
@@ -329,6 +345,9 @@ const h=location.hash.replace('#',''); if(SABLONLAR[h]) sel.value=h;
 ciz();
 // pencere boyutu değişince taze render (auto-fit doğru ölçsün)
 let rz; addEventListener('resize',()=>{ clearTimeout(rz); rz=setTimeout(ciz,200); });
+// font geç yüklenirse / yazdırmadan önce ölçümü garantiye al (idempotent)
+addEventListener('load',tumFit);
+addEventListener('beforeprint',tumFit);
 
 /* ---- Giriş (basit kapı; kimlik bilgileri buradan değiştirilir) ---- */
 const GIRIS = { kullanici:"eve", sifre:"eve2026" };
