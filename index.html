@@ -56,14 +56,15 @@
   .count{font-family:Arial,sans-serif;font-size:13px;color:#444;font-weight:700;margin-left:auto}
 
   /* ---- Sayfa ---- */
-  .sayfa{background:#fff;margin:16px auto;display:grid;
-         border-left:1px solid #000;border-top:1px solid #000;box-shadow:0 2px 18px rgba(0,0,0,.12)}
+  .sayfa{background:#fff;margin:16px auto;display:grid;padding:5mm;gap:4mm;
+         box-shadow:0 2px 18px rgba(0,0,0,.12)}
   .sayfa.yatay{width:297mm;height:210mm}
   .sayfa.dikey{width:210mm;height:297mm}
   .g6{grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(2,1fr)}
   .g2{grid-template-columns:repeat(2,1fr);grid-template-rows:1fr}
   .g1{grid-template-columns:1fr;grid-template-rows:1fr}
-  .kart{border-right:1px solid #000;border-bottom:1px solid #000;overflow:hidden}
+  /* her kart ayrı siyah kesim çerçevesi (orijinaldeki gibi) */
+  .kart{border:1.5px solid #000;overflow:hidden}
   .g6 .kart{padding:7mm 6mm 4mm}
   .g2 .kart{padding:14mm 12mm 8mm}
   .g1 .kart{padding:24mm 22mm 15mm}
