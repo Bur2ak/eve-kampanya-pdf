@@ -1,0 +1,359 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Eve Kampanya — Toplu PDF Sistemi</title>
+<style id="pg"></style>
+<style>
+  @font-face{
+    font-family:'UniformPro';
+    src:url('UniformPro-Bold.ttf') format('truetype');
+    font-weight:700;font-style:normal;font-display:swap;
+  }
+  :root{ --pembe:#E6007E; --sari:#FFE100; }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'UniformPro','Arial Black','Arial',sans-serif;background:#eef0f3;color:#111}
+  .ff{font-family:Arial,Helvetica,sans-serif}
+
+  /* ---- Giriş ekranı ---- */
+  #giris{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;
+         background:linear-gradient(135deg,#E6007E 0%,#b3005f 60%,#7d0043 100%)}
+  .giris-kart{background:#fff;width:340px;max-width:90vw;border-radius:18px;padding:34px 28px 28px;
+              box-shadow:0 24px 60px rgba(0,0,0,.35);text-align:center}
+  .giris-kart img{width:118px;height:auto;margin:0 auto 14px}
+  .giris-kart h2{font-family:Arial,sans-serif;font-size:17px;color:#222;margin-bottom:2px}
+  .giris-kart .alt{font-family:Arial,sans-serif;font-weight:400;font-size:12px;color:#8a8a8a;margin-bottom:20px}
+  .giris-kart input{font-family:Arial,sans-serif;font-size:14px;width:100%;padding:12px 14px;margin-bottom:11px;
+                    border:1.5px solid #ddd;border-radius:10px;outline:none}
+  .giris-kart input:focus{border-color:var(--pembe)}
+  .giris-kart button{font-family:Arial,sans-serif;font-weight:700;font-size:15px;width:100%;padding:13px;
+                     border:0;border-radius:10px;background:var(--pembe);color:#fff;cursor:pointer;margin-top:4px}
+  .giris-kart button:hover{background:#c70069}
+  .giris-hata{font-family:Arial,sans-serif;font-size:12.5px;color:#d0021b;min-height:18px;margin-bottom:6px}
+
+  /* ---- Üst bar ---- */
+  .topbar{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid #e3e3e3;
+          box-shadow:0 1px 8px rgba(0,0,0,.05)}
+  .topbar-ic{max-width:1100px;margin:0 auto;padding:12px 18px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .brand{display:flex;align-items:center;gap:10px;font-family:Arial,sans-serif;font-weight:800;font-size:16px;color:#222}
+  .brand img{width:40px;height:auto}
+  .brand small{display:block;font-weight:400;font-size:11px;color:#9a9a9a}
+  .cikis{margin-left:auto;font-family:Arial,sans-serif;font-size:12px;color:#999;background:none;border:0;cursor:pointer;padding:6px}
+  .cikis:hover{color:var(--pembe)}
+  .aciklama{max-width:1100px;margin:0 auto;padding:12px 18px 0}
+  .aciklama p{font-family:Arial,sans-serif;font-weight:400;font-size:13px;color:#666;line-height:1.5}
+  .panel{max-width:1100px;margin:0 auto;padding:14px 18px 6px}
+  .bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+  select,button{font-family:Arial,sans-serif;font-weight:700;font-size:14px;border-radius:9px;padding:11px 16px;cursor:pointer}
+  select{border:1.5px solid #ccc;background:#fff;min-width:230px}
+  button{border:0}
+  .btn-pdf{background:var(--pembe);color:#fff}
+  .btn-pdf:hover{background:#c70069}
+  .btn-load{background:#fff;color:#111;border:1.5px solid #ccc}
+  .hint{font-family:Arial,sans-serif;font-size:12px;color:#888}
+  textarea{width:100%;height:110px;font-family:monospace;font-size:12px;padding:10px;border:1px solid #ccc;border-radius:8px;margin-bottom:8px;display:none}
+  .count{font-family:Arial,sans-serif;font-size:13px;color:#444;font-weight:700;margin-left:auto}
+
+  /* ---- Sayfa ---- */
+  .sayfa{background:#fff;margin:16px auto;display:grid;
+         border-left:1px solid #000;border-top:1px solid #000;box-shadow:0 2px 18px rgba(0,0,0,.12)}
+  .sayfa.yatay{width:297mm;height:210mm}
+  .sayfa.dikey{width:210mm;height:297mm}
+  .g6{grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(2,1fr)}
+  .g2{grid-template-columns:repeat(2,1fr);grid-template-rows:1fr}
+  .g1{grid-template-columns:1fr;grid-template-rows:1fr}
+  .kart{border-right:1px solid #000;border-bottom:1px solid #000;overflow:hidden}
+  .g6 .kart{padding:7mm 6mm 4mm}
+  .g2 .kart{padding:14mm 12mm 8mm}
+  .g1 .kart{padding:24mm 22mm 15mm}
+  .icerik{height:100%;overflow:hidden;display:flex;flex-direction:column;align-items:center;text-align:center}
+
+  /* Ortak */
+  .marka{line-height:1.02;text-transform:uppercase;width:100%}
+  .metin{line-height:1.1;text-transform:uppercase;width:100%;margin-top:2mm}
+  .kosul{text-transform:uppercase;line-height:1.1;width:100%}
+  .eski{line-height:1}
+  .yeni{line-height:1;width:100%}
+  .oran{width:100%}
+  .yerine{font-family:Arial,sans-serif;font-weight:700;letter-spacing:1px}
+  .logo{width:100%;height:auto;display:block}
+  .tl{font-size:.62em}
+  .legal{font-family:Arial,sans-serif;font-weight:400;color:#111;width:100%;margin-top:auto;line-height:1.3}
+  .kutu{border:2.5px solid #111;border-radius:9mm;width:100%;
+        display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .net{text-transform:uppercase}
+  .oran{line-height:.9}
+  .oran .pct{font-size:.5em;vertical-align:.35em}
+  .indirim{background:#111;color:#fff;font-style:italic;text-transform:uppercase;transform:rotate(-4deg)}
+
+  /* --- Eve 6'lı --- */
+  .t-eve .marka{margin-bottom:3mm}
+  .t-eve .metin{margin-bottom:3mm}
+  .t-eve .eski{font-size:26px}
+  .t-eve .yerine{font-size:12px;margin:2mm 0}
+  .t-eve .logowrap{width:28mm;margin:1mm 0 2mm}
+  .t-eve .yeni{margin-top:1mm}
+  .t-eve .legal{font-size:7px;padding-top:3mm}
+
+  /* --- Yeni kulakçık 6'lı (rozetli) --- */
+  .t-kul .marka{margin-bottom:2mm}
+  .t-kul .kosul{margin-top:2mm}
+  .t-kul .altrow{display:flex;align-items:center;justify-content:center;gap:6mm;width:100%;margin-top:3mm}
+  .t-kul .badge{border:2px solid #111;border-radius:50%;width:26mm;height:26mm;flex:none;
+                display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .t-kul .bpct{font-size:22px;line-height:1}
+  .t-kul .bpct .pct{font-size:.5em;vertical-align:.35em}
+  .t-kul .bind{background:#111;color:#fff;font-style:italic;font-size:9px;padding:.4mm 2mm;transform:rotate(-4deg);margin-top:.6mm}
+  .t-kul .fiyatblok{display:flex;flex-direction:column;align-items:center}
+  .t-kul .eski{font-size:30px}
+  .t-kul .yerine2{font-family:Arial,sans-serif;font-weight:700;font-size:13px;margin:1mm 0}
+  .t-kul .yeni{font-size:38px}
+  .t-kul .legal{font-size:7px;padding-top:3mm}
+
+  /* --- Fiyatlı (A5 ikili) --- */
+  .t-a5f .kutu{padding:6mm;margin-bottom:7mm}
+  .t-a5f .metin{margin-top:2mm}
+  .t-a5f .eski{font-size:52px}
+  .t-a5f .yerine{font-size:20px;margin:3mm 0}
+  .t-a5f .logowrap{width:46mm;margin:1mm 0 4mm}
+  .t-a5f .yeni{margin-top:2mm}
+  .t-a5f .legal{font-size:11px;padding-top:6mm}
+  /* --- Fiyatlı (A4 T-askı, dikey tek) --- */
+  .t-t4f .kutu{padding:9mm;margin-bottom:10mm}
+  .t-t4f .metin{margin-top:3mm}
+  .t-t4f .eski{font-size:80px}
+  .t-t4f .yerine{font-size:30px;margin:5mm 0}
+  .t-t4f .logowrap{width:70mm;margin:2mm 0 6mm}
+  .t-t4f .yeni{margin-top:3mm}
+  .t-t4f .legal{font-size:14px;padding-top:8mm}
+
+  /* --- Fiyatsız (A5 ikili) --- */
+  .t-a5s .kutu{padding:6mm;margin-bottom:6mm}
+  .t-a5s .net{font-size:32px;margin-top:1mm}
+  .t-a5s .indirim{font-size:46px;line-height:1;padding:3mm 9mm;margin-top:2mm}
+  .t-a5s .legal{font-size:11px;padding-top:7mm}
+  /* --- Fiyatsız (A4 T-askı, dikey tek) --- */
+  .t-t4s .kutu{padding:9mm;margin-bottom:9mm}
+  .t-t4s .net{font-size:46px;margin-top:2mm}
+  .t-t4s .indirim{font-size:70px;line-height:1;padding:4mm 12mm;margin-top:3mm}
+  .t-t4s .legal{font-size:14px;padding-top:9mm}
+
+  @media print{
+    body{background:#fff}
+    #giris,.topbar,.aciklama,.panel{display:none !important}
+    .sayfa{margin:0;box-shadow:none;page-break-after:always}
+  }
+</style>
+</head>
+<body>
+
+<!-- Giriş ekranı -->
+<div id="giris">
+  <div class="giris-kart">
+    <img src="eve-logo.png" alt="Eve Kart">
+    <h2>Eve Kampanya Sistemi</h2>
+    <div class="alt">Toplu PDF etiket üretimi</div>
+    <form onsubmit="girisYap(event)">
+      <div class="giris-hata" id="girisHata"></div>
+      <input id="gKullanici" placeholder="Kullanıcı adı" autocomplete="username">
+      <input id="gSifre" type="password" placeholder="Şifre" autocomplete="current-password">
+      <button type="submit">Giriş Yap</button>
+    </form>
+  </div>
+</div>
+
+<!-- Uygulama -->
+<div id="uygulama" style="display:none">
+  <div class="topbar">
+    <div class="topbar-ic">
+      <div class="brand"><img src="eve-logo.png" alt=""><span>Eve Kampanya Sistemi<small>Toplu PDF etiket üretimi</small></span></div>
+      <button class="cikis" onclick="cikisYap()">Çıkış</button>
+    </div>
+  </div>
+  <div class="aciklama">
+    <p><b>Şablon seç</b> → <b>PDF olarak indir</b> → yazdırma ekranında <b>Hedef: PDF olarak kaydet</b>, <b>Kenar boşlukları: Yok</b>, <b>Arka plan grafikleri: açık</b>. Uzun metin/fiyat kutuya otomatik sığar. Siyah çizgiler kesim içindir.</p>
+  </div>
+  <div class="panel">
+    <div class="bar">
+      <select id="sablon" onchange="ciz()"></select>
+      <button class="btn-pdf" onclick="window.print()">📄 PDF olarak indir</button>
+      <button class="btn-load" onclick="toggleYapistir()">Kendi verini yapıştır</button>
+      <span class="count" id="say"></span>
+    </div>
+    <textarea id="ta" placeholder="Excel'den kopyala-yapıştır (TAB ayraçlı satırlar)"></textarea>
+    <div class="bar" id="yapistirBar" style="display:none">
+      <button class="btn-load" onclick="uygulaYapistir()">Yapıştırılanı uygula</button>
+      <span class="hint" id="yapistirHint"></span>
+    </div>
+  </div>
+  <div id="cikti"></div>
+</div>
+
+<template id="logoTpl"><img class="logo" src="eve-logo.png" alt="Eve Kart"></template>
+
+<script src="data.js"></script>
+<script src="data-kategori.js"></script>
+<script>
+function logoSVG(){ return document.getElementById('logoTpl').innerHTML; }
+const LEGAL_URUN = "Kampanyaya dahil ürünler etikette yıldızla işaretlenmiştir.<br>Fiyatlar 25.07.2026 - 26.07.2026 tarihleri arasında Eve mağazalarında Eve Kart ile yapacağınız alışverişlerde geçerlidir.";
+const KOSUL = "250₺ VE ÜZERİ ALIŞVERİŞİNİZE";
+
+/* Boyut profilleri (fitw elemanları): [max, min] px */
+const PROF = {
+  't-a5f':{marka:[60,22], metin:[30,13], yeni:[104,40]},
+  't-t4f':{marka:[100,32],metin:[48,18], yeni:[150,50]},
+  't-a5s':{marka:[56,20], kosul:[26,12], oran:[150,60]},
+  't-t4s':{marka:[86,28], kosul:[40,16], oran:[240,80]},
+};
+
+/* ---- Kart şablonları ---- */
+function kartEve(u){
+  return `<div class="kart t-eve"><div class="icerik">
+    <div class="marka fitw sc" data-max="34" data-min="15">${u.marka}</div>
+    <div class="metin fitw sc" data-max="16" data-min="8">${u.metin}</div>
+    <div class="eski sc">${u.eski}<span class="tl">₺</span></div>
+    <div class="yerine sc">YERİNE</div>
+    <div class="logowrap">${logoSVG()}</div>
+    <div class="yeni fitw sc" data-max="56" data-min="24">${u.yeni}<span class="tl">₺</span></div>
+    <div class="legal">${LEGAL_URUN}</div>
+  </div></div>`;
+}
+function kartKulakcik(u){
+  return `<div class="kart t-kul"><div class="icerik">
+    <div class="marka fitw sc" data-max="30" data-min="13">${u.marka}</div>
+    <div class="metin fitw sc" data-max="14" data-min="8">${u.metin}</div>
+    <div class="kosul fitw sc" data-max="15" data-min="8">${KOSUL}</div>
+    <div class="altrow">
+      <div class="badge sc"><div class="bpct"><span class="pct">%</span>${u.oran}</div><div class="bind">İNDİRİM</div></div>
+      <div class="fiyatblok">
+        <div class="eski sc">${u.eski}<span class="tl">₺</span></div>
+        <div class="yerine2 sc">Yerine</div>
+        <div class="yeni sc">${u.yeni}<span class="tl">₺</span></div>
+      </div>
+    </div>
+    <div class="legal">${LEGAL_URUN}</div>
+  </div></div>`;
+}
+function kartFiyatli(u,cls){
+  const p=PROF[cls];
+  return `<div class="kart ${cls}"><div class="icerik">
+    <div class="kutu">
+      <div class="marka fitw sc" data-max="${p.marka[0]}" data-min="${p.marka[1]}">${u.marka}</div>
+      <div class="metin fitw sc" data-max="${p.metin[0]}" data-min="${p.metin[1]}">${u.metin}</div>
+    </div>
+    <div class="eski sc">${u.eski}<span class="tl">₺</span></div>
+    <div class="yerine sc">YERİNE</div>
+    <div class="logowrap">${logoSVG()}</div>
+    <div class="yeni fitw sc" data-max="${p.yeni[0]}" data-min="${p.yeni[1]}">${u.yeni}<span class="tl">₺</span></div>
+    <div class="legal">${LEGAL_URUN}</div>
+  </div></div>`;
+}
+function kartFiyatsiz(k,cls){
+  const p=PROF[cls]; const legal=k.legal?k.legal.replace(/\. /g,'.<br>'):"";
+  return `<div class="kart ${cls}"><div class="icerik">
+    <div class="kutu">
+      <div class="marka fitw sc" data-max="${p.marka[0]}" data-min="${p.marka[1]}">${k.metin}</div>
+    </div>
+    <div class="kosul fitw sc" data-max="${p.kosul[0]}" data-min="${p.kosul[1]}">${KOSUL}</div>
+    <div class="net sc">NET</div>
+    <div class="oran fitw sc" data-max="${p.oran[0]}" data-min="${p.oran[1]}"><span class="pct">%</span>${k.oran}</div>
+    <div class="indirim sc">İNDİRİM</div>
+    <div class="legal">${legal}</div>
+  </div></div>`;
+}
+
+const SABLONLAR = {
+  eve:{ad:"Eve Kart Kulakçık (6'lı)",         veri:"urun",    per:6,grid:"g6",yon:"yatay",kart:u=>kartEve(u),           yap:"Marka · Ürün · Eski fiyat · Yeni fiyat"},
+  kul:{ad:"Yeni Kulakçık (6'lı, rozetli)",    veri:"urun",    per:6,grid:"g6",yon:"yatay",kart:u=>kartKulakcik(u),      yap:"Marka · Ürün · Eski fiyat · Yeni fiyat · Oran"},
+  a5f:{ad:"A5 İkili — Fiyatlı",               veri:"urun",    per:2,grid:"g2",yon:"yatay",kart:u=>kartFiyatli(u,'t-a5f'),yap:"Marka · Ürün · Eski fiyat · Yeni fiyat"},
+  a5s:{ad:"A5 İkili — Fiyatsız (% indirim)",  veri:"kategori",per:2,grid:"g2",yon:"yatay",kart:k=>kartFiyatsiz(k,'t-a5s'),yap:"Kampanya metni · Oran (sayı)"},
+  t4f:{ad:"A4 T-Askı — Fiyatlı",              veri:"urun",    per:1,grid:"g1",yon:"dikey",kart:u=>kartFiyatli(u,'t-t4f'),yap:"Marka · Ürün · Eski fiyat · Yeni fiyat"},
+  t4s:{ad:"A4 T-Askı — Fiyatsız (% indirim)", veri:"kategori",per:1,grid:"g1",yon:"dikey",kart:k=>kartFiyatsiz(k,'t-t4s'),yap:"Kampanya metni · Oran (sayı)"},
+};
+
+/* ---- auto-fit ---- */
+function fit(el,maxPx,minPx){
+  // sadece yatay sığdırma (tek kelime/uzun sayı taşmasını engeller);
+  // dikey sığdırmayı kart-seviyesi döngü (fitCard) yapar
+  let s=maxPx, g=0; el.style.fontSize=s+'px';
+  while(s>minPx && el.scrollWidth>el.clientWidth+1 && g<400){ s-=1; el.style.fontSize=s+'px'; g++; }
+}
+function fitCard(kart){
+  const ic=kart.querySelector('.icerik'); if(!ic) return;
+  ic.querySelectorAll('.fitw').forEach(el=>fit(el,+el.dataset.max,+el.dataset.min));
+  let g=0;
+  while(ic.scrollHeight>ic.clientHeight+1 && g<90){
+    ic.querySelectorAll('.sc').forEach(el=>{ const c=parseFloat(getComputedStyle(el).fontSize); el.style.fontSize=(c*0.95)+'px'; });
+    ic.querySelectorAll('.logowrap').forEach(l=>l.style.width=(parseFloat(getComputedStyle(l).width)*0.95)+'px');
+    const b=ic.querySelector('.badge'); if(b){ b.style.width=(parseFloat(getComputedStyle(b).width)*0.95)+'px'; b.style.height=b.style.width; }
+    g++;
+  }
+}
+
+/* ---- çizim ---- */
+function veriSec(s){ return s.veri==="kategori" ? (window.KATEGORILER||[]) : (window.URUNLER||[]); }
+function ciz(){
+  const s=SABLONLAR[document.getElementById('sablon').value];
+  document.getElementById('pg').textContent='@media print{@page{size:A4 '+(s.yon==='dikey'?'portrait':'landscape')+';margin:0}}';
+  const list=veriSec(s), cikti=document.getElementById('cikti'); cikti.innerHTML='';
+  for(let i=0;i<list.length;i+=s.per){
+    const grup=list.slice(i,i+s.per);
+    let inner=grup.map(s.kart).join('');
+    for(let k=grup.length;k<s.per;k++) inner+='<div class="kart"></div>';
+    const p=document.createElement('div'); p.className='sayfa '+s.yon+' '+s.grid; p.innerHTML=inner;
+    cikti.appendChild(p);
+  }
+  const uygula=()=>document.querySelectorAll('.kart').forEach(fitCard);
+  if(document.fonts && document.fonts.ready){ document.fonts.ready.then(()=>requestAnimationFrame(uygula)); }
+  else requestAnimationFrame(uygula);
+  document.getElementById('say').textContent=list.length+' kayıt · '+Math.ceil(list.length/s.per)+' sayfa';
+  document.getElementById('yapistirHint').textContent="Sıra: "+s.yap;
+}
+function toggleYapistir(){
+  const ta=document.getElementById('ta'),bar=document.getElementById('yapistirBar');
+  const show=ta.style.display!=='block'; ta.style.display=show?'block':'none'; bar.style.display=show?'flex':'none';
+}
+function uygulaYapistir(){
+  const s=SABLONLAR[document.getElementById('sablon').value];
+  const t=document.getElementById('ta').value.trim(); if(!t) return;
+  const rows=t.split(/\r?\n/).map(l=>l.split('\t')).filter(c=>c[0]);
+  if(s.veri==="kategori") window.KATEGORILER=rows.map(c=>({metin:(c[0]||'').trim(),oran:(c[1]||'').replace(/[^0-9]/g,''),legal:""}));
+  else window.URUNLER=rows.map(c=>({marka:(c[0]||'').trim(),metin:(c[1]||'').trim(),eski:(c[2]||'').trim(),yeni:(c[3]||'').trim(),oran:(c[4]||'').replace(/[^0-9]/g,'')}));
+  ciz();
+}
+
+const sel=document.getElementById('sablon');
+Object.keys(SABLONLAR).forEach(k=>{ const o=document.createElement('option'); o.value=k; o.textContent=SABLONLAR[k].ad; sel.appendChild(o); });
+const h=location.hash.replace('#',''); if(SABLONLAR[h]) sel.value=h;
+ciz();
+// pencere boyutu değişince taze render (auto-fit doğru ölçsün)
+let rz; addEventListener('resize',()=>{ clearTimeout(rz); rz=setTimeout(ciz,200); });
+
+/* ---- Giriş (basit kapı; kimlik bilgileri buradan değiştirilir) ---- */
+const GIRIS = { kullanici:"eve", sifre:"eve2026" };
+function girisAc(){
+  document.getElementById('giris').style.display='none';
+  document.getElementById('uygulama').style.display='block';
+  requestAnimationFrame(ciz);   // görünür olunca doğru ölçüp yeniden çiz
+}
+function girisYap(e){
+  e.preventDefault();
+  const k=document.getElementById('gKullanici').value.trim();
+  const s=document.getElementById('gSifre').value;
+  if(k===GIRIS.kullanici && s===GIRIS.sifre){
+    try{ sessionStorage.setItem('eveGiris','1'); }catch(_){}
+    girisAc();
+  }else{
+    document.getElementById('girisHata').textContent='Kullanıcı adı veya şifre hatalı.';
+  }
+}
+function cikisYap(){
+  try{ sessionStorage.removeItem('eveGiris'); }catch(_){}
+  location.reload();
+}
+// oturum açıksa giriş ekranını atla
+try{ if(sessionStorage.getItem('eveGiris')==='1') girisAc(); }catch(_){}
+</script>
+</body>
+</html>
