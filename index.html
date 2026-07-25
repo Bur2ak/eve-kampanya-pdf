@@ -181,14 +181,16 @@
     </div>
   </div>
   <div class="aciklama">
-    <p><b>Şablon seç</b> → <b>PDF olarak indir</b> (yazdırma ekranında <b>PDF olarak kaydet</b>, <b>Kenar boşlukları: Yok</b>, <b>Arka plan grafikleri: açık</b>). Illustrator'da düzenlemek için <b>SVG indir</b>'i kullanın: yazılar canlı metin, kutu/çizgi/logo vektör olarak açılır. Uzun metin/fiyat çerçeveye otomatik sığar.</p>
+    <p><b>Şablon seç</b> → <b>PDF olarak indir</b> (yazdırma ekranında <b>PDF olarak kaydet</b>, <b>Kenar boşlukları: Yok</b>, <b>Arka plan grafikleri: açık</b>). <b>Excel yükle</b> ile dosyanızı seçin (ya da elle yapıştırın). Illustrator için <b>SVG indir</b>'i kullanın: yazılar canlı metin, kutu/çizgi/logo vektör olarak açılır. Uzun metin/fiyat çerçeveye otomatik sığar.</p>
   </div>
   <div class="panel">
     <div class="bar">
       <select id="sablon" onchange="ciz()"></select>
       <button class="btn-pdf" onclick="window.print()">📄 PDF olarak indir</button>
       <button class="btn-load" onclick="svgIndir()">✏️ SVG indir (Illustrator)</button>
-      <button class="btn-load" onclick="toggleYapistir()">Kendi verini yapıştır</button>
+      <button class="btn-load" onclick="document.getElementById('xls').click()">📁 Excel yükle</button>
+      <input type="file" id="xls" accept=".xlsx,.xls" onchange="excelYukle(this)" style="display:none">
+      <button class="btn-load" onclick="toggleYapistir()">Elle yapıştır</button>
       <span class="count" id="say"></span>
     </div>
     <textarea id="ta" placeholder="Excel'den kopyala-yapıştır (TAB ayraçlı satırlar)"></textarea>
@@ -202,6 +204,7 @@
 
 <template id="logoTpl"><img class="logo" src="eve-logo.png" alt="Eve Kart"></template>
 
+<script src="xlsx.min.js"></script>
 <script src="data.js"></script>
 <script src="data-kategori.js"></script>
 <script>
@@ -358,6 +361,48 @@ function ciz(){
 function toggleYapistir(){
   const ta=document.getElementById('ta'),bar=document.getElementById('yapistirBar');
   const show=ta.style.display!=='block'; ta.style.display=show?'block':'none'; bar.style.display=show?'flex':'none';
+}
+
+/* ---- Excel dosyası yükleme (kopyala-yapıştır yerine) ---- */
+function paraFmt(v){
+  if(v===null||v===undefined||v==='') return '';
+  if(typeof v==='number'){ let s=v.toLocaleString('tr-TR',{minimumFractionDigits:2,maximumFractionDigits:2}); return s.endsWith(',00')?s.slice(0,-3):s; }
+  return String(v).trim();
+}
+function excelYukle(input){
+  const file=input.files&&input.files[0]; if(!file) return;
+  if(typeof XLSX==='undefined'){ alert('Excel okuyucu yüklenemedi.'); return; }
+  const fr=new FileReader();
+  fr.onload=e=>{
+    try{
+      const wb=XLSX.read(e.target.result,{type:'array'});
+      let urunler=[], kategoriler=[];
+      for(const name of wb.SheetNames){
+        const rows=XLSX.utils.sheet_to_json(wb.Sheets[name],{header:1,defval:''});
+        const hi=rows.findIndex(r=>Array.isArray(r)&&r.some(c=>/KAMPANYA MET|MARKA/i.test(String(c))));
+        if(hi<0) continue;
+        const H=rows[hi].map(c=>String(c).toLocaleUpperCase('tr').trim());
+        const col=(...ks)=>{ for(const k of ks){ const i=H.findIndex(h=>h.includes(k)); if(i>=0) return i; } return -1; };
+        const cM=col('MARKA'), cT=col('KAMPANYA MET'), cE=col('SATIŞ FİYATI'), cY=col('KAMPANYA SATIŞ'), cO=col('İNDİRİM ORANI','INDIRIM ORANI'), cL=col('LEGAL');
+        const data=rows.slice(hi+1);
+        if(cM>=0 && cE>=0){ // ürün sayfası
+          for(const r of data){ if(!r[cM]&&!r[cT]) continue;
+            urunler.push({marka:String(r[cM]||'').trim(), metin:String(r[cT]||'').trim(), eski:paraFmt(r[cE]), yeni:paraFmt(r[cY]), oran:(typeof r[cO]==='number'?String(Math.round(r[cO]<1?r[cO]*100:r[cO])):'')}); }
+        } else if(cT>=0 && cO>=0){ // kategori sayfası
+          let legal='';
+          for(const r of data){ if(cL>=0&&r[cL]) legal=String(r[cL]); if(!r[cT]) continue;
+            const o=r[cO]; kategoriler.push({metin:String(r[cT]).trim(), oran:(typeof o==='number'?String(Math.round(o<1?o*100:o)):''), legal:legal.replace(/ /g,' ').trim()}); }
+        }
+      }
+      if(!urunler.length && !kategoriler.length){ alert('Excel içinde uygun sütun bulunamadı (MARKA / KAMPANYA METNİ / FİYAT).'); return; }
+      if(urunler.length) window.URUNLER=urunler;
+      if(kategoriler.length) window.KATEGORILER=kategoriler;
+      ciz();
+      alert('Yüklendi: '+[urunler.length?urunler.length+' ürün':'', kategoriler.length?kategoriler.length+' kategori':''].filter(Boolean).join(', '));
+    }catch(err){ alert('Excel okunamadı: '+err.message); }
+    input.value='';
+  };
+  fr.readAsArrayBuffer(file);
 }
 
 /* ================= SVG EXPORT (Illustrator'da düzenlenebilir) ================= */
