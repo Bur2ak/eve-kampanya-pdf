@@ -9,11 +9,11 @@
   @font-face{
     font-family:'KampanyaFont';
     src:url('kampanya-font.ttf') format('truetype');
-    font-weight:700;font-style:normal;font-display:swap;
+    font-weight:100 900;font-style:normal;font-display:swap;
   }
   :root{ --pembe:#E6007E; --sari:#FFE100; }
   *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:'KampanyaFont','Arial Black','Arial',sans-serif;background:#eef0f3;color:#111}
+  body{font-family:'KampanyaFont','Arial Black','Arial',sans-serif;font-weight:800;background:#eef0f3;color:#111}
   .ff{font-family:Arial,Helvetica,sans-serif}
 
   /* ---- Giriş ekranı ---- */
@@ -77,6 +77,8 @@
   /* Ortak */
   .marka{line-height:1.02;text-transform:uppercase;width:100%}
   .metin{line-height:1.1;text-transform:uppercase;width:100%;margin-top:2mm}
+  /* 6'lı kulakçıklarda ürün açıklaması ince (marka kalın) — orijinaldeki gibi */
+  .t-eve .metin,.t-kul .metin{font-weight:500}
   .kosul{text-transform:uppercase;line-height:1.1;width:100%;white-space:nowrap}
   .eski{line-height:1}
   .yeni{line-height:1;width:100%}
@@ -108,12 +110,12 @@
   .t-kul .altrow{display:flex;align-items:center;justify-content:center;gap:5mm;width:100%;margin-top:5mm}
   .t-kul .badge{border:2px solid #111;border-radius:50%;width:28mm;height:28mm;flex:none;
                 display:flex;flex-direction:column;align-items:center;justify-content:center}
-  .t-kul .bpct{font-size:18px;line-height:1}
+  .t-kul .bpct{font-size:21px;line-height:1}
   .t-kul .bpct .pct{font-size:.5em;vertical-align:.35em}
-  .t-kul .bind{background:#111;color:#fff;font-style:italic;font-size:7px;padding:.4mm 2mm;transform:skewX(-9deg) rotate(-4deg);margin-top:1mm}
+  .t-kul .bind{background:#111;color:#fff;font-style:italic;font-size:8.5px;padding:.5mm 2mm;transform:skewX(-9deg) rotate(-4deg);margin-top:1mm}
   .t-kul .fiyatblok{display:flex;flex-direction:column;align-items:center}
   .t-kul .eski{font-size:33px}
-  .t-kul .yerine2{font-family:Arial,sans-serif;font-weight:700;font-size:17px;margin:1.5mm 0}
+  .t-kul .yerine2{font-weight:700;font-size:18px;margin:1.5mm 0}
   .t-kul .yeni{font-size:43px}
   .t-kul .legal{font-size:7px;padding-top:3mm}
 
@@ -228,8 +230,8 @@ function kartEve(u){
 function kartKulakcik(u){
   return `<div class="kart t-kul"><div class="icerik">
     <div class="marka fitw sc" data-max="30" data-min="13">${u.marka}</div>
-    <div class="metin fitw sc" data-max="14" data-min="8">${u.metin}</div>
-    <div class="kosul fitw sc" data-max="15" data-min="8">${KOSUL}</div>
+    <div class="metin fitw sc" data-max="13" data-min="8">${u.metin}</div>
+    <div class="kosul fitw sc" data-max="18" data-min="9">${KOSUL}</div>
     <div class="altrow">
       <div class="badge"><div class="bpct"><span class="pct">%</span>${u.oran}</div><div class="bind">İNDİRİM</div></div>
       <div class="fiyatblok">
