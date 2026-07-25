@@ -76,7 +76,7 @@
   /* Ortak */
   .marka{line-height:1.02;text-transform:uppercase;width:100%}
   .metin{line-height:1.1;text-transform:uppercase;width:100%;margin-top:2mm}
-  .kosul{text-transform:uppercase;line-height:1.1;width:100%}
+  .kosul{text-transform:uppercase;line-height:1.1;width:100%;white-space:nowrap}
   .eski{line-height:1}
   .yeni{line-height:1;width:100%}
   .oran{width:100%}
@@ -89,7 +89,8 @@
   .net{text-transform:uppercase}
   .oran{line-height:.9}
   .oran .pct{font-size:.5em;vertical-align:.35em}
-  .indirim{background:#111;color:#fff;font-style:italic;text-transform:uppercase;transform:rotate(-4deg)}
+  .indirim{background:#111;color:#fff;font-style:italic;text-transform:uppercase;
+           display:inline-block;transform:skewX(-9deg) rotate(-4deg)}
 
   /* --- Eve 6'lı --- */
   .t-eve .marka{margin-bottom:3mm}
@@ -135,12 +136,12 @@
   /* --- Fiyatsız (A5 ikili) --- */
   .t-a5s .kutu{padding:6mm;margin-bottom:6mm}
   .t-a5s .net{font-size:32px;margin-top:1mm}
-  .t-a5s .indirim{font-size:46px;line-height:1;padding:3mm 9mm;margin-top:2mm}
+  .t-a5s .indirim{font-size:46px;line-height:1;padding:2.5mm 6mm;margin-top:2mm}
   .t-a5s .legal{font-size:11px;padding-top:7mm}
   /* --- Fiyatsız (A4 T-askı, dikey tek) --- */
   .t-t4s .kutu{padding:9mm;margin-bottom:9mm}
   .t-t4s .net{font-size:46px;margin-top:2mm}
-  .t-t4s .indirim{font-size:70px;line-height:1;padding:4mm 12mm;margin-top:3mm}
+  .t-t4s .indirim{font-size:70px;line-height:1;padding:3mm 8mm;margin-top:3mm}
   .t-t4s .legal{font-size:14px;padding-top:9mm}
 
   @media print{
