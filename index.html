@@ -104,17 +104,17 @@
 
   /* --- Yeni kulakçık 6'lı (rozetli) --- */
   .t-kul .marka{margin-bottom:2mm}
-  .t-kul .kosul{margin-top:2mm}
-  .t-kul .altrow{display:flex;align-items:center;justify-content:center;gap:6mm;width:100%;margin-top:3mm}
-  .t-kul .badge{border:2px solid #111;border-radius:50%;width:26mm;height:26mm;flex:none;
+  .t-kul .kosul{margin-top:5mm}
+  .t-kul .altrow{display:flex;align-items:center;justify-content:center;gap:5mm;width:100%;margin-top:5mm}
+  .t-kul .badge{border:2px solid #111;border-radius:50%;width:28mm;height:28mm;flex:none;
                 display:flex;flex-direction:column;align-items:center;justify-content:center}
-  .t-kul .bpct{font-size:22px;line-height:1}
+  .t-kul .bpct{font-size:18px;line-height:1}
   .t-kul .bpct .pct{font-size:.5em;vertical-align:.35em}
-  .t-kul .bind{background:#111;color:#fff;font-style:italic;font-size:9px;padding:.4mm 2mm;transform:rotate(-4deg);margin-top:.6mm}
+  .t-kul .bind{background:#111;color:#fff;font-style:italic;font-size:7px;padding:.4mm 2mm;transform:skewX(-9deg) rotate(-4deg);margin-top:1mm}
   .t-kul .fiyatblok{display:flex;flex-direction:column;align-items:center}
-  .t-kul .eski{font-size:30px}
-  .t-kul .yerine2{font-family:Arial,sans-serif;font-weight:700;font-size:13px;margin:1mm 0}
-  .t-kul .yeni{font-size:38px}
+  .t-kul .eski{font-size:33px}
+  .t-kul .yerine2{font-family:Arial,sans-serif;font-weight:700;font-size:17px;margin:1.5mm 0}
+  .t-kul .yeni{font-size:43px}
   .t-kul .legal{font-size:7px;padding-top:3mm}
 
   /* --- Fiyatlı (A5 ikili) --- */
@@ -231,7 +231,7 @@ function kartKulakcik(u){
     <div class="metin fitw sc" data-max="14" data-min="8">${u.metin}</div>
     <div class="kosul fitw sc" data-max="15" data-min="8">${KOSUL}</div>
     <div class="altrow">
-      <div class="badge sc"><div class="bpct"><span class="pct">%</span>${u.oran}</div><div class="bind">İNDİRİM</div></div>
+      <div class="badge"><div class="bpct"><span class="pct">%</span>${u.oran}</div><div class="bind">İNDİRİM</div></div>
       <div class="fiyatblok">
         <div class="eski sc">${u.eski}<span class="tl">₺</span></div>
         <div class="yerine2 sc">Yerine</div>
@@ -306,7 +306,6 @@ function fitCard(kart){
   while(ic.scrollHeight>ic.clientHeight+1 && g<90){
     ic.querySelectorAll('.sc').forEach(el=>{ const c=parseFloat(getComputedStyle(el).fontSize); el.style.fontSize=(c*0.95)+'px'; });
     ic.querySelectorAll('.logowrap').forEach(l=>l.style.width=(parseFloat(getComputedStyle(l).width)*0.95)+'px');
-    if(bd){ bd.style.width=(parseFloat(getComputedStyle(bd).width)*0.95)+'px'; bd.style.height=bd.style.width; }
     g++;
   }
 }
