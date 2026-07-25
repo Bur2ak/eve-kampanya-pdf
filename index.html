@@ -393,19 +393,20 @@ function metinSatirlari(el, pr){
     const baseTop=Math.min(...L.chars.filter(c=>c.fs===maxfs).map(c=>c.t));
     const y=baseTop - pr.top + maxfs*0.80;
     const l=Math.min(...L.chars.map(c=>c.l)) - pr.left;
+    const r=Math.max(...L.chars.map(c=>c.r)) - pr.left;
     const runs=[];
     for(const c of L.chars){
       const last=runs[runs.length-1];
       if(last && last.fs===c.fs && last.fill===c.fill && last.italic===c.italic && last.fam===c.fam) last.text+=c.ch;
       else runs.push({fs:c.fs, fill:c.fill, italic:c.italic, fam:c.fam, text:c.ch});
     }
-    return {l, y, runs};
+    return {l, r, cx:(l+r)/2, y, runs};
   });
 }
 function metinSVG(el, pr){
   let s='';
   for(const L of metinSatirlari(el, pr)){
-    s+=`<text x="${L.l.toFixed(1)}" y="${L.y.toFixed(1)}">`;
+    s+=`<text x="${L.cx.toFixed(1)}" y="${L.y.toFixed(1)}" text-anchor="middle">`;
     for(const run of L.runs)
       s+=`<tspan font-family="${run.fam}" font-size="${run.fs.toFixed(1)}"${run.italic?' font-style="italic"':''} fill="${run.fill}">${xmlesc(run.text)}</tspan>`;
     s+='</text>';
