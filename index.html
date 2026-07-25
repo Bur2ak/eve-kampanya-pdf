@@ -120,7 +120,7 @@
   .t-kul .legal{font-size:7px;padding-top:3mm}
 
   /* --- Fiyatlı (A5 ikili) --- */
-  .t-a5f .kutu{padding:6mm;margin-bottom:3mm}
+  .t-a5f .kutu{padding:6mm;margin-bottom:3mm;height:40mm}
   .t-a5f .metin{margin-top:2mm}
   .t-a5f .eski{font-size:40px}
   .t-a5f .yerine{font-size:16px;margin:1.5mm 0}
@@ -128,7 +128,7 @@
   .t-a5f .yeni{margin-top:1mm}
   .t-a5f .legal{font-size:11px;padding-top:6mm}
   /* --- Fiyatlı (A4 T-askı, dikey tek) --- */
-  .t-t4f .kutu{padding:9mm;margin-bottom:5mm}
+  .t-t4f .kutu{padding:9mm;margin-bottom:5mm;height:68mm}
   .t-t4f .metin{margin-top:3mm}
   .t-t4f .eski{font-size:60px}
   .t-t4f .yerine{font-size:30px;margin:2.5mm 0}
@@ -137,12 +137,12 @@
   .t-t4f .legal{font-size:14px;padding-top:8mm}
 
   /* --- Fiyatsız (A5 ikili) --- */
-  .t-a5s .kutu{padding:6mm;margin-bottom:6mm}
+  .t-a5s .kutu{padding:6mm;margin-bottom:6mm;height:42mm}
   .t-a5s .net{font-size:26px;margin-top:1mm}
   .t-a5s .indirim{font-size:38px;line-height:1;padding:2.5mm 6mm;margin-top:2mm}
   .t-a5s .legal{font-size:11px;padding-top:7mm}
   /* --- Fiyatsız (A4 T-askı, dikey tek) --- */
-  .t-t4s .kutu{padding:9mm;margin-bottom:9mm}
+  .t-t4s .kutu{padding:9mm;margin-bottom:9mm;height:62mm}
   .t-t4s .net{font-size:38px;margin-top:2mm}
   .t-t4s .indirim{font-size:56px;line-height:1;padding:3mm 8mm;margin-top:3mm}
   .t-t4s .legal{font-size:14px;padding-top:9mm}
@@ -309,6 +309,17 @@ function fitCard(kart){
           bd.style.width=bd.dataset.b+'px'; bd.style.height=bd.dataset.b+'px'; }
   // fitw'leri yatayda sığdır (içeride max'a resetler)
   ic.querySelectorAll('.fitw').forEach(el=>fit(el,+el.dataset.max,+el.dataset.min));
+  // KUTU SABİT: çerçeve büyümez, içindeki yazı (marka+açıklama) küçülüp sığar (müşteri kuralı)
+  const kutu=ic.querySelector('.kutu');
+  if(kutu){
+    let gb=0;
+    while(kutu.scrollHeight>kutu.clientHeight+1 && gb<150){
+      kutu.querySelectorAll('.marka,.metin').forEach(el=>{
+        const c=parseFloat(getComputedStyle(el).fontSize); el.style.fontSize=(c*0.96)+'px';
+      });
+      gb++;
+    }
+  }
   // dikeyde taşarsa hepsini birlikte küçült
   let g=0;
   while(ic.scrollHeight>ic.clientHeight+1 && g<90){
