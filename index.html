@@ -206,6 +206,12 @@
 function logoSVG(){ return document.getElementById('logoTpl').innerHTML; }
 const LEGAL_URUN = "Kampanyaya dahil ürünler etikette yıldızla işaretlenmiştir.<br>Fiyatlar 25.07.2026 - 26.07.2026 tarihleri arasında Eve mağazalarında Eve Kart ile yapacağınız alışverişlerde geçerlidir.";
 const KOSUL = "250₺ VE ÜZERİ ALIŞVERİŞİNİZE";
+// "... ÜRÜN ÇEŞİTLERİ/ADEDİ" son ekini kendi satırına indir (müşteri isteği)
+function urunBreak(m){
+  if(!m) return m;
+  const i = m.toLocaleLowerCase('tr').lastIndexOf('ürün');
+  return i>0 ? m.slice(0,i).trim()+'<br>'+m.slice(i) : m;
+}
 
 /* Boyut profilleri (fitw elemanları): [max, min] px */
 const PROF = {
@@ -219,7 +225,7 @@ const PROF = {
 function kartEve(u){
   return `<div class="kart t-eve"><div class="icerik">
     <div class="marka fitw sc" data-max="34" data-min="15">${u.marka}</div>
-    <div class="metin fitw sc" data-max="16" data-min="8">${u.metin}</div>
+    <div class="metin fitw sc" data-max="16" data-min="8">${urunBreak(u.metin)}</div>
     <div class="eski sc">${u.eski}<span class="tl">₺</span></div>
     <div class="yerine sc">YERİNE</div>
     <div class="logowrap">${logoSVG()}</div>
@@ -230,7 +236,7 @@ function kartEve(u){
 function kartKulakcik(u){
   return `<div class="kart t-kul"><div class="icerik">
     <div class="marka fitw sc" data-max="30" data-min="13">${u.marka}</div>
-    <div class="metin fitw sc" data-max="13" data-min="8">${u.metin}</div>
+    <div class="metin fitw sc" data-max="13" data-min="8">${urunBreak(u.metin)}</div>
     <div class="kosul fitw sc" data-max="16" data-min="9">${KOSUL}</div>
     <div class="altrow">
       <div class="badge"><div class="bpct"><span class="pct">%</span>${u.oran}</div><div class="bind">İNDİRİM</div></div>
@@ -248,7 +254,7 @@ function kartFiyatli(u,cls){
   return `<div class="kart ${cls}"><div class="icerik">
     <div class="kutu">
       <div class="marka fitw sc" data-max="${p.marka[0]}" data-min="${p.marka[1]}">${u.marka}</div>
-      <div class="metin fitw sc" data-max="${p.metin[0]}" data-min="${p.metin[1]}">${u.metin}</div>
+      <div class="metin fitw sc" data-max="${p.metin[0]}" data-min="${p.metin[1]}">${urunBreak(u.metin)}</div>
     </div>
     <div class="eski sc">${u.eski}<span class="tl">₺</span></div>
     <div class="yerine sc">YERİNE</div>
